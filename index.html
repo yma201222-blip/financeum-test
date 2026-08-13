@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Р¤РёРЅР°РЅСЃРЈРј вЂ” РІС…РѕРґРЅРѕР№ С‚РµСЃС‚</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#20BA5A;
+    --green-dark:#0E7C39;
+    --ink:#13271B;
+    --card:#E3F4EA;
+    --border:#CDEBD9;
+    --amber:#E8A63B;
+    --white:#FFFFFF;
+    --danger:#C24444;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: linear-gradient(180deg,#F7FBF8 0%, #EDF7F0 100%);
+    color:var(--ink);
+    font-family:'PT Sans', sans-serif;
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  h1,h2,h3,.mono-num{font-family:'Montserrat',sans-serif;}
+  .wrap{max-width:720px;margin:0 auto;padding:0 20px;}
+
+  /* header / stamp */
+  .top{
+    background:var(--ink);
+    color:var(--white);
+    padding:36px 0 28px;
+    position:relative;
+    overflow:hidden;
+  }
+  .top::after{
+    content:"Р¤";
+    position:absolute;
+    right:-10px; top:-30px;
+    font-family:'Montserrat',sans-serif;
+    font-weight:800;
+    font-size:180px;
+    color:rgba(32,186,90,0.14);
+    line-height:1;
+  }
+  .top .eyebrow{
+    font-family:'PT Mono', monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--green);
+    margin-bottom:10px;
+  }
+  .top h1{font-size:26px;margin:0 0 8px;font-weight:800;}
+  .top p{margin:0;color:#CFE6D8;font-size:14px;max-width:480px;}
+
+  /* progress */
+  .progress-rail{
+    display:flex;gap:6px;margin:22px 0 0;
+  }
+  .progress-rail span{
+    flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,0.18);
+    transition:background .3s;
+  }
+  .progress-rail span.done{background:var(--green);}
+
+  main{padding-top:28px;}
+
+  .section{
+    background:var(--white);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:26px 24px;
+    margin-bottom:18px;
+    display:none;
+  }
+  .section.active{display:block;animation:fadeIn .3s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .section .num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:28px;height:28px;border-radius:8px;
+    background:var(--card);color:var(--green-dark);
+    font-weight:800;font-size:13px;margin-right:10px;
+  }
+  .section h2{font-size:18px;margin:0 0 4px;display:flex;align-items:center;}
+  .section .sub{color:#5A7566;font-size:13px;margin:0 0 20px 38px;}
+
+  .q{margin-bottom:22px;}
+  .q:last-child{margin-bottom:0;}
+  .q-text{font-weight:700;font-size:15px;margin-bottom:10px;}
+  .options{display:flex;flex-direction:column;gap:8px;}
+  .opt{
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    padding:11px 14px;
+    cursor:pointer;
+    font-size:14px;
+    transition:all .15s;
+    background:#FCFEFC;
+  }
+  .opt:hover{border-color:var(--green);background:var(--card);}
+  .opt.selected{
+    border-color:var(--green-dark);
+    background:var(--card);
+    font-weight:700;
+    box-shadow:inset 0 0 0 1px var(--green-dark);
+  }
+  .opt input{display:none;}
+
+  input[type=text], textarea{
+    width:100%;
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    padding:11px 14px;
+    font-family:'PT Sans',sans-serif;
+    font-size:14px;
+    resize:vertical;
+  }
+  input[type=text]:focus, textarea:focus{outline:2px solid var(--green);border-color:transparent;}
+
+  .nav{display:flex;justify-content:space-between;gap:12px;margin-top:6px;}
+  button{
+    font-family:'Montserrat',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    border-radius:10px;
+    padding:13px 22px;
+    cursor:pointer;
+    border:none;
+  }
+  .btn-primary{background:var(--green-dark);color:var(--white);}
+  .btn-primary:hover{background:var(--green);}
+  .btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--border);}
+  .btn-ghost:hover{border-color:var(--green-dark);}
+  button:disabled{opacity:.4;cursor:not-allowed;}
+
+  .error{color:var(--danger);font-size:13px;margin-top:8px;display:none;}
+
+  /* result stamp */
+  .result{
+    background:var(--white);
+    border:2px solid var(--green-dark);
+    border-radius:16px;
+    padding:34px 26px;
+    text-align:center;
+    position:relative;
+  }
+  .result .badge{
+    display:inline-block;
+    font-family:'PT Mono',monospace;
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--green-dark);
+    border:1px solid var(--green-dark);
+    border-radius:20px;
+    padding:5px 14px;
+    margin-bottom:16px;
+  }
+  .result h2{font-size:24px;margin:0 0 6px;}
+  .result .group-name{
+    font-size:30px;font-weight:800;color:var(--green-dark);
+    margin:14px 0;
+  }
+  .result .slogan{font-style:normal;color:#5A7566;font-size:14px;margin-top:6px;}
+  .scorebar-row{display:flex;justify-content:space-between;font-size:13px;margin:16px 0 4px;color:#5A7566;}
+  .scorebar{height:8px;background:var(--card);border-radius:4px;overflow:hidden;margin-bottom:14px;}
+  .scorebar i{display:block;height:100%;background:var(--green);}
+
+  .admin-link{
+    text-align:center;margin-top:30px;
+  }
+  .admin-link a{
+    font-size:12px;color:#8CA697;text-decoration:underline;cursor:pointer;
+  }
+
+  /* admin */
+  .admin-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:16px;}
+  .admin-table th,.admin-table td{border:1px solid var(--border);padding:8px 10px;text-align:left;}
+  .admin-table th{background:var(--card);font-family:'Montserrat',sans-serif;}
+  .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+  .pill.Рђ{background:#F3E3CB;color:#8A5A15;}
+  .pill.Р‘{background:#CDEBD9;color:var(--green-dark);}
+  .pill.Р’{background:#DCE3F7;color:#324D9E;}
+
+  @media(max-width:480px){
+    .top h1{font-size:22px;}
+    .section{padding:20px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="wrap">
+    <div class="eyebrow">Р¤РёРЅР°РЅСЃРЈРј В· Р‘СѓС…РіР°Р»С‚РµСЂ СЃ РЅСѓР»СЏ</div>
+    <h1 id="headerTitle">Р’С…РѕРґРЅРѕР№ С‚РµСЃС‚ РєР°РЅРґРёРґР°С‚Р°</h1>
+    <p>7вЂ“12 РјРёРЅСѓС‚. РўРµСЃС‚ РѕС†РµРЅРёРІР°РµС‚ РЅРµ С‚РѕР»СЊРєРѕ Р·РЅР°РЅРёРµ Р±СѓС…СѓС‡С‘С‚Р°, Р° РѕР±С‰СѓСЋ РѕР±СѓС‡Р°РµРјРѕСЃС‚СЊ: РѕРїС‹С‚, Р»РѕРіРёРєСѓ Рё СЂР°Р±РѕС‚Сѓ СЃ РєРѕРјРїСЊСЋС‚РµСЂРѕРј вЂ” СЌС‚Рѕ Р»СѓС‡С€Рµ РїРѕРєР°Р·С‹РІР°РµС‚, РєС‚Рѕ Р±С‹СЃС‚СЂРѕ РѕСЃРІРѕРёС‚СЃСЏ РІ 1РЎ.</p>
+    <div class="progress-rail" id="progressRail"></div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <!-- INTRO -->
+  <section class="section active" data-step="intro">
+    <h2><span class="num">вЂў</span>РќР°С‡Р°Р»Рѕ</h2>
+    <p class="sub">РџР°СЂР° СЃР»РѕРІ Рѕ СЃРµР±Рµ</p>
+    <div class="q">
+      <div class="q-text">Р’Р°С€Рµ РёРјСЏ Рё С„Р°РјРёР»РёСЏ</div>
+      <input type="text" id="candName" placeholder="РќР°РїСЂРёРјРµСЂ, РџР°С‚РёРјР°С‚ Р“Р°РґР¶РёРµРІР°">
+    </div>
+    <div class="q">
+      <div class="q-text">РўРµР»РµС„РѕРЅ РёР»Рё Telegram РґР»СЏ СЃРІСЏР·Рё</div>
+      <input type="text" id="candContact" placeholder="+7 900 000-00-00 РёР»Рё @username">
+    </div>
+    <div class="nav" style="justify-content:flex-end">
+      <button class="btn-primary" onclick="goTo(1)">РќР°С‡Р°С‚СЊ С‚РµСЃС‚ в†’</button>
+    </div>
+  </section>
+
+  <div id="quizRoot"></div>
+
+  <!-- RESULT -->
+  <section class="section" data-step="result">
+    <div class="result">
+      <div class="badge">Р РµР·СѓР»СЊС‚Р°С‚ С‚РµСЃС‚Р°</div>
+      <h2 id="resName">РљР°РЅРґРёРґР°С‚</h2>
+      <div class="group-name" id="resGroup">вЂ”</div>
+      <div class="slogan">Р‘СѓС…РіР°Р»С‚РµСЂРёСЏ вЂ” СЌС‚Рѕ РїРѕРЅСЏС‚РЅРѕ</div>
+
+      <div style="text-align:left;margin-top:24px;">
+        <div class="scorebar-row"><span>РћР±СѓС‡Р°РµРјРѕСЃС‚СЊ (РѕРїС‹С‚ + РєРѕРјРїСЊСЋС‚РµСЂ + Р»РѕРіРёРєР°)</span><span id="scoreA">0/40</span></div>
+        <div class="scorebar"><i id="barA" style="width:0%"></i></div>
+        <div class="scorebar-row"><span>РЎС‚Р°СЂС‚РѕРІС‹Рµ Р·РЅР°РЅРёСЏ Р±СѓС…СѓС‡С‘С‚Р°</span><span id="scoreD">0/10</span></div>
+        <div class="scorebar"><i id="barD" style="width:0%"></i></div>
+      </div>
+      <p style="text-align:left;font-size:13px;color:#5A7566;margin-top:18px;" id="resComment"></p>
+
+      <div id="proTestBlock" style="display:none;margin-top:24px;padding:18px 16px;background:var(--card);border-radius:12px;text-align:left;">
+        <p style="margin:0 0 12px;font-size:14px;font-weight:700;color:var(--green-dark);">Р’С‹ РѕС‚РјРµС‚РёР»Рё РѕРїС‹С‚ СЂР°Р±РѕС‚С‹ Р±СѓС…РіР°Р»С‚РµСЂРѕРј</p>
+        <p style="margin:0 0 14px;font-size:13px;color:#3E5A48;">РџСЂРѕР№РґРёС‚Рµ РєРѕСЂРѕС‚РєСѓСЋ СѓРіР»СѓР±Р»С‘РЅРЅСѓСЋ РґРёР°РіРЅРѕСЃС‚РёРєСѓ РїРѕ РІСЃРµРј СѓС‡Р°СЃС‚РєР°Рј СѓС‡С‘С‚Р° вЂ” С‚Р°Рє РјС‹ РїРѕРґР±РµСЂС‘Рј РїСЂРѕРіСЂР°РјРјСѓ РёРјРµРЅРЅРѕ РїРѕРґ РІР°С€ СѓСЂРѕРІРµРЅСЊ Рё Р·Р°РїСЂРѕСЃ.</p>
+        <a href="pro.html" style="display:inline-block;background:var(--green-dark);color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;border-radius:10px;padding:12px 20px;text-decoration:none;">РџСЂРѕР№С‚Рё СѓРіР»СѓР±Р»С‘РЅРЅСѓСЋ РґРёР°РіРЅРѕСЃС‚РёРєСѓ в†’</a>
+      </div>
+    </div>
+    <p style="text-align:center;font-size:12px;color:#8CA697;margin-top:26px;">Р РµР·СѓР»СЊС‚Р°С‚ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё СЃРѕС…СЂР°РЅС‘РЅ Рё РѕС‚РїСЂР°РІР»РµРЅ РѕСЂРіР°РЅРёР·Р°С‚РѕСЂСѓ.</p>
+  </section>
+
+</main>
+
+<script>
+/* ================= DATA ================= */
+
+const BLOCK_A = {
+  key:'A', title:'РћРїС‹С‚ Рё Р±СЌРєРіСЂР°СѓРЅРґ', sub:'РџСЂРѕ РІР°С€Сѓ РїСЂРѕС€Р»СѓСЋ СЂР°Р±РѕС‚Сѓ',
+  questions:[
+    {id:'a1', text:'РЎРєРѕР»СЊРєРѕ РІСЂРµРјРµРЅРё РІС‹ СЂР°Р±РѕС‚Р°Р»Рё РІ РѕС„РёСЃРµ РЅР° РїРѕСЃС‚РѕСЏРЅРЅРѕР№ РѕСЃРЅРѕРІРµ (РЅРµ СЃС‡РёС‚Р°СЏ СѓС‡С‘Р±С‹)?', type:'single',
+      options:[
+        {t:'РќРµ СЂР°Р±РѕС‚Р°Р»(Р°) РІ РѕС„РёСЃРµ', s:0},
+        {t:'РњРµРЅСЊС€Рµ 1 РіРѕРґР°', s:2},
+        {t:'1вЂ“3 РіРѕРґР°', s:4},
+        {t:'Р‘РѕР»РµРµ 3 Р»РµС‚', s:6}
+      ]},
+    {id:'a2', text:'РЎ РєР°РєРёРјРё Р·Р°РґР°С‡Р°РјРё РІС‹ СЂРµРіСѓР»СЏСЂРЅРѕ СЂР°Р±РѕС‚Р°Р»Рё РЅР° РїСЂРѕС€Р»С‹С… РјРµСЃС‚Р°С…?', type:'multi',
+      options:[
+        {t:'РЎРѕСЃС‚Р°РІР»РµРЅРёРµ РѕС‚С‡С‘С‚РѕРІ, С‚Р°Р±Р»РёС†, РґРѕРєСѓРјРµРЅС‚РѕРІ', s:2},
+        {t:'Р Р°Р±РѕС‚Р° СЃ РєР»РёРµРЅС‚Р°РјРё (РїРµСЂРµРіРѕРІРѕСЂС‹, РїРµСЂРµРїРёСЃРєР°)', s:2},
+        {t:'Р Р°Р±РѕС‚Р° СЃ CRM, 1РЎ, ERP РёР»Рё РїРѕС…РѕР¶РёРј РџРћ', s:2},
+        {t:'Р’РµРґРµРЅРёРµ РіСЂР°С„РёРєРѕРІ, СЃСЂРѕРєРѕРІ, РєРѕРЅС‚СЂРѕР»СЊ РґРµРґР»Р°Р№РЅРѕРІ', s:2},
+        {t:'РќРёС‡РµРіРѕ РёР· РїРµСЂРµС‡РёСЃР»РµРЅРЅРѕРіРѕ', s:0}
+      ]},
+    {id:'a3', text:'Р•СЃС‚СЊ Р»Рё Сѓ РІР°СЃ Р±СѓС…РіР°Р»С‚РµСЂСЃРєРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ (РґРёРїР»РѕРј, РєСѓСЂСЃС‹)?', type:'single',
+      options:[
+        {t:'Р”Р°, РЅРѕ РЅРµ СЂР°Р±РѕС‚Р°Р»(Р°) РїРѕ СЃРїРµС†РёР°Р»СЊРЅРѕСЃС‚Рё', s:1},
+        {t:'Р”Р°, Рё РµСЃС‚СЊ РѕРїС‹С‚ СЂР°Р±РѕС‚С‹ Р±СѓС…РіР°Р»С‚РµСЂРѕРј', s:6},
+        {t:'РќРµС‚', s:0}
+      ]},
+    {id:'a4', text:'РџСЂРёС…РѕРґРёР»РѕСЃСЊ Р»Рё СЃР°РјРѕСЃС‚РѕСЏС‚РµР»СЊРЅРѕ СЂР°Р·Р±РёСЂР°С‚СЊСЃСЏ РІ РЅРѕРІРѕР№ РїСЂРѕРіСЂР°РјРјРµ Р±РµР· РѕР±СѓС‡РµРЅРёСЏ?', type:'single',
+      options:[
+        {t:'Р”Р°, СЂРµРіСѓР»СЏСЂРЅРѕ', s:4},
+        {t:'Р‘С‹Р»Рѕ РїР°СЂСѓ СЂР°Р·', s:2},
+        {t:'РќРµС‚, РѕР±С‹С‡РЅРѕ РЅСѓР¶РµРЅ РєС‚Рѕ-С‚Рѕ, РєС‚Рѕ РїРѕРєР°Р¶РµС‚', s:0}
+      ]},
+    {id:'a5', text:'РљР°Рє РІС‹ РѕР±С‹С‡РЅРѕ РїРѕСЃС‚СѓРїР°РµС‚Рµ, РµСЃР»Рё РЅРµ РїРѕРЅРёРјР°РµС‚Рµ Р·Р°РґР°РЅРёРµ РЅР° РЅРѕРІРѕР№ СЂР°Р±РѕС‚Рµ?', type:'single',
+      options:[
+        {t:'РџСЂРѕР±СѓСЋ СЂР°Р·РѕР±СЂР°С‚СЊСЃСЏ СЃР°Рј(Р°), РїРѕС‚РѕРј СѓС‚РѕС‡РЅСЏСЋ РµСЃР»Рё РЅРµ РІС‹С€Р»Рѕ', s:3},
+        {t:'РЎСЂР°Р·Сѓ РёРґСѓ СЃРїСЂР°С€РёРІР°С‚СЊ', s:1},
+        {t:'Р–РґСѓ, РєРѕРіРґР° РєС‚Рѕ-С‚Рѕ Р·Р°РјРµС‚РёС‚ Рё РїРѕРјРѕР¶РµС‚', s:0}
+      ]},
+    {id:'a6', text:'Р•СЃС‚СЊ Р»Рё Сѓ РІР°СЃ РѕРїС‹С‚ СЃР°РјРѕСЃС‚РѕСЏС‚РµР»СЊРЅРѕР№/СѓРґР°Р»С‘РЅРЅРѕР№ СЂР°Р±РѕС‚С‹ (С„СЂРёР»Р°РЅСЃ, РРџ, СЃРІРѕР±РѕРґРЅС‹Р№ РіСЂР°С„РёРє)?', type:'single',
+      options:[{t:'Р”Р°', s:1},{t:'РќРµС‚', s:0}]}
+  ]
+};
+
+const BLOCK_B = {
+  key:'B', title:'Р Р°Р±РѕС‚Р° СЃ РєРѕРјРїСЊСЋС‚РµСЂРѕРј', sub:'Р‘Р°Р·РѕРІР°СЏ С†РёС„СЂРѕРІР°СЏ РіСЂР°РјРѕС‚РЅРѕСЃС‚СЊ',
+  questions:[
+    {id:'b1', text:'Р’ Excel/Google РўР°Р±Р»РёС†Р°С… РІ СЏС‡РµР№РєСѓ РІРІРµР»Рё =РЎРЈРњРњ(A1:A5), РЅРѕ РІ РґРёР°РїР°Р·РѕРЅРµ РµСЃС‚СЊ С‚РµРєСЃС‚ РІРјРµСЃС‚Рѕ С‡РёСЃРµР». Р§С‚Рѕ РїСЂРѕРёР·РѕР№РґС‘С‚?', type:'single',
+      options:[
+        {t:'Р¤РѕСЂРјСѓР»Р° РїРѕСЃС‡РёС‚Р°РµС‚ С‚РѕР»СЊРєРѕ С‡РёСЃР»Р°, С‚РµРєСЃС‚ РїСЂРѕРёРіРЅРѕСЂРёСЂСѓРµС‚', s:3},
+        {t:'Р’С‹РґР°СЃС‚ РѕС€РёР±РєСѓ', s:1},
+        {t:'РќРµ Р·РЅР°СЋ', s:0}
+      ]},
+    {id:'b2', text:'РќСѓР¶РЅРѕ РЅР°Р№С‚Рё РєРѕРЅРєСЂРµС‚РЅРѕРµ СЃР»РѕРІРѕ РІ Р±РѕР»СЊС€РѕРј РґРѕРєСѓРјРµРЅС‚Рµ Word. Р§С‚Рѕ СЃРґРµР»Р°РµС‚Рµ?', type:'single',
+      options:[
+        {t:'Ctrl+F Рё РІРІРµРґСѓ СЃР»РѕРІРѕ', s:3},
+        {t:'Р‘СѓРґСѓ Р»РёСЃС‚Р°С‚СЊ РІСЂСѓС‡РЅСѓСЋ', s:0},
+        {t:'РќРµ Р·РЅР°СЋ', s:0}
+      ]},
+    {id:'b3', text:'РљР°Рє СЃРѕС…СЂР°РЅРёС‚СЊ РґРѕРєСѓРјРµРЅС‚ Word РІ С„РѕСЂРјР°С‚Рµ PDF?', type:'single',
+      options:[
+        {t:'Р¤Р°Р№Р» в†’ РЎРѕС…СЂР°РЅРёС‚СЊ РєР°Рє / Р­РєСЃРїРѕСЂС‚ в†’ РІС‹Р±СЂР°С‚СЊ PDF', s:2},
+        {t:'РќРµ Р·РЅР°СЋ', s:0}
+      ]},
+    {id:'b4', text:'РћС†РµРЅРёС‚Рµ СЃРІРѕР№ СѓСЂРѕРІРµРЅСЊ РІР»Р°РґРµРЅРёСЏ РєРѕРјРїСЊСЋС‚РµСЂРѕРј', type:'single',
+      options:[
+        {t:'РЈРІРµСЂРµРЅРЅРѕ СЂР°Р±РѕС‚Р°СЋ СЃ РїР°РїРєР°РјРё, РїРѕС‡С‚РѕР№, С‚Р°Р±Р»РёС†Р°РјРё, РґРѕРєСѓРјРµРЅС‚Р°РјРё', s:2},
+        {t:'РџРѕР»СЊР·СѓСЋСЃСЊ Р±Р°Р·РѕРІС‹РјРё С„СѓРЅРєС†РёСЏРјРё, РЅРѕ РјРЅРѕРіРѕРµ РЅРµР·РЅР°РєРѕРјРѕ', s:1},
+        {t:'РџСЂР°РєС‚РёС‡РµСЃРєРё РЅРµ СЂР°Р±РѕС‚Р°Р»(Р°) СЃ РєРѕРјРїСЊСЋС‚РµСЂРѕРј', s:0}
+      ]}
+  ]
+};
+
+const BLOCK_C = {
+  key:'C', title:'Р›РѕРіРёРєР°', sub:'6 РєРѕСЂРѕС‚РєРёС… Р·Р°РґР°С‡ вЂ” Р·РґРµСЃСЊ РЅРµС‚ В«РїСЂР°РІРёР»СЊРЅРѕРіРѕ Р±СЌРєРіСЂР°СѓРЅРґР°В», РІР°Р¶РЅР° С‚РѕР»СЊРєРѕ Р»РѕРіРёРєР°',
+  questions:[
+    {id:'c1', text:'РџСЂРѕРґРѕР»Р¶РёС‚Рµ СЂСЏРґ: 2, 4, 8, 16, ... ?', type:'single',
+      options:[{t:'18', s:0},{t:'24', s:0},{t:'32', s:2},{t:'20', s:0}]},
+    {id:'c2', text:'Р•СЃР»Рё РІСЃРµ Р±СѓС…РіР°Р»С‚РµСЂС‹ СЂР°Р±РѕС‚Р°СЋС‚ РІРЅРёРјР°С‚РµР»СЊРЅРѕ, Р° РњР°РґРёРЅР° вЂ” Р±СѓС…РіР°Р»С‚РµСЂ, С‚Рѕ:', type:'single',
+      options:[
+        {t:'РњР°РґРёРЅР° СЂР°Р±РѕС‚Р°РµС‚ РІРЅРёРјР°С‚РµР»СЊРЅРѕ', s:2},
+        {t:'РњР°РґРёРЅР°, РІРѕР·РјРѕР¶РЅРѕ, СЂР°Р±РѕС‚Р°РµС‚ РІРЅРёРјР°С‚РµР»СЊРЅРѕ', s:0},
+        {t:'РќРµР»СЊР·СЏ СЃРєР°Р·Р°С‚СЊ С‚РѕС‡РЅРѕ', s:0}
+      ]},
+    {id:'c3', text:'РЈ РђР»Рё Р±С‹Р»Рѕ 5 РєР»РёРµРЅС‚РѕРІ. РћРЅ РїРѕС‚РµСЂСЏР» РґРІСѓС…, РЅРѕ РЅР°С€С‘Р» РІ РґРІР° СЂР°Р·Р° Р±РѕР»СЊС€Рµ РЅРѕРІС‹С…, С‡РµРј РїРѕС‚РµСЂСЏР». РЎРєРѕР»СЊРєРѕ РєР»РёРµРЅС‚РѕРІ Сѓ РђР»Рё СЃРµР№С‡Р°СЃ?', type:'single',
+      options:[{t:'6', s:0},{t:'7', s:2},{t:'9', s:0},{t:'3', s:0}]},
+    {id:'c4', text:'Р§С‚Рѕ Р»РёС€РЅРµРµ РІ СЂСЏРґСѓ: РєР°СЃСЃР°, СЃРєР»Р°Рґ, РЅР°РєР»Р°РґРЅР°СЏ, РґРёСЂРµРєС‚РѕСЂ?', type:'single',
+      options:[{t:'РљР°СЃСЃР°', s:0},{t:'РЎРєР»Р°Рґ', s:0},{t:'РќР°РєР»Р°РґРЅР°СЏ', s:0},{t:'Р”РёСЂРµРєС‚РѕСЂ', s:2}]},
+    {id:'c5', text:'РўРѕРІР°СЂ РїСЂРёС€С‘Р» РЅР° СЃРєР»Р°Рґ 5-РіРѕ С‡РёСЃР»Р°, СЃС‡С‘С‚ РІС‹СЃС‚Р°РІР»РµРЅ 10-РіРѕ, РґРµРЅСЊРіРё РїРѕСЃС‚СѓРїРёР»Рё 15-РіРѕ. РљРѕРіРґР° С‚РѕРІР°СЂ С„РёР·РёС‡РµСЃРєРё РѕРєР°Р·Р°Р»СЃСЏ РЅР° СЃРєР»Р°РґРµ?', type:'single',
+      options:[{t:'5-РіРѕ', s:2},{t:'10-РіРѕ', s:0},{t:'15-РіРѕ', s:0},{t:'РќРµР»СЊР·СЏ РѕРїСЂРµРґРµР»РёС‚СЊ', s:0}]},
+    {id:'c6', text:'Р Р°СЃСЃС‚Р°РІСЊС‚Рµ РїРѕ Р»РѕРіРёС‡РЅРѕРјСѓ РїРѕСЂСЏРґРєСѓ РґРµР№СЃС‚РІРёСЏ РєРѕРјРїР°РЅРёРё:', type:'single',
+      options:[
+        {t:'РџРѕР»СѓС‡РёС‚СЊ Р·Р°СЏРІРєСѓ в†’ РІС‹СЃС‚Р°РІРёС‚СЊ СЃС‡С‘С‚ в†’ РїРѕР»СѓС‡РёС‚СЊ РѕРїР»Р°С‚Сѓ в†’ РѕС‚РіСЂСѓР·РёС‚СЊ С‚РѕРІР°СЂ', s:2},
+        {t:'РћС‚РіСЂСѓР·РёС‚СЊ С‚РѕРІР°СЂ в†’ РїРѕР»СѓС‡РёС‚СЊ Р·Р°СЏРІРєСѓ в†’ РІС‹СЃС‚Р°РІРёС‚СЊ СЃС‡С‘С‚ в†’ РїРѕР»СѓС‡РёС‚СЊ РѕРїР»Р°С‚Сѓ', s:0},
+        {t:'Р’С‹СЃС‚Р°РІРёС‚СЊ СЃС‡С‘С‚ в†’ РїРѕР»СѓС‡РёС‚СЊ Р·Р°СЏРІРєСѓ в†’ РѕС‚РіСЂСѓР·РёС‚СЊ С‚РѕРІР°СЂ в†’ РїРѕР»СѓС‡РёС‚СЊ РѕРїР»Р°С‚Сѓ', s:0},
+        {t:'РџРѕР»СѓС‡РёС‚СЊ РѕРїР»Р°С‚Сѓ в†’ РїРѕР»СѓС‡РёС‚СЊ Р·Р°СЏРІРєСѓ в†’ РІС‹СЃС‚Р°РІРёС‚СЊ СЃС‡С‘С‚ в†’ РѕС‚РіСЂСѓР·РёС‚СЊ С‚РѕРІР°СЂ', s:0}
+      ]}
+  ]
+};
+
+const BLOCK_D = {
+  key:'D', title:'РЎС‚Р°СЂС‚РѕРІС‹Рµ Р·РЅР°РЅРёСЏ Р±СѓС…СѓС‡С‘С‚Р°', sub:'Р­С‚Рѕ РЅРµ СЂРµС€Р°СЋС‰РёР№ Р±Р»РѕРє вЂ” РѕРЅ С‚РѕР»СЊРєРѕ РґРёР°РіРЅРѕСЃС‚РёРєР°',
+  questions:[
+    {id:'d1', text:'Р—РЅР°РµС‚Рµ Р»Рё РІС‹, С‡С‚Рѕ С‚Р°РєРѕРµ РќР”РЎ?', type:'single',
+      options:[
+        {t:'Р”Р°, РјРѕРіСѓ РѕР±СЉСЏСЃРЅРёС‚СЊ СЃРІРѕРёРјРё СЃР»РѕРІР°РјРё', s:2},
+        {t:'РЎР»С‹С€Р°Р»(Р°), РЅРѕ РЅРµ РјРѕРіСѓ РѕР±СЉСЏСЃРЅРёС‚СЊ', s:1},
+        {t:'РќРµС‚', s:0}
+      ]},
+    {id:'d2', text:'Р Р°Р±РѕС‚Р°Р»Рё Р»Рё РІС‹ СЂР°РЅСЊС€Рµ РІ 1РЎ С…РѕС‚СЏ Р±С‹ СЌРїРёР·РѕРґРёС‡РµСЃРєРё?', type:'single',
+      options:[{t:'Р”Р°', s:2},{t:'РќРµС‚', s:0}]},
+    {id:'d3', text:'Р’Р°С€ РѕРїС‹С‚ СЂР°Р±РѕС‚С‹ Р±СѓС…РіР°Р»С‚РµСЂРѕРј', type:'single', flagKey:true,
+      options:[
+        {t:'РќРёРєРѕРіРґР° РЅРµ СЂР°Р±РѕС‚Р°Р»(Р°) Р±СѓС…РіР°Р»С‚РµСЂРѕРј', s:0, flag:false},
+        {t:'Р Р°Р±РѕС‚Р°Р»(Р°) РїРѕРјРѕС‰РЅРёРєРѕРј/Р°СЃСЃРёСЃС‚РµРЅС‚РѕРј Р±СѓС…РіР°Р»С‚РµСЂР°', s:3, flag:false},
+        {t:'Р Р°Р±РѕС‚Р°Р»(Р°) СЃР°РјРѕСЃС‚РѕСЏС‚РµР»СЊРЅРѕ РІРµРґСѓС‰РёРј Р±СѓС…РіР°Р»С‚РµСЂРѕРј', s:6, flag:true}
+      ]},
+    {id:'d4', text:'РЎРІРѕРёРјРё СЃР»РѕРІР°РјРё: С‡С‚Рѕ С‚Р°РєРѕРµ В«РїСЂРѕРІРѕРґРєР°В»? (РЅРµ РѕС†РµРЅРёРІР°РµС‚СЃСЏ Р±Р°Р»Р»Р°РјРё, РЅРѕ РІР°Р¶РЅРѕ РґР»СЏ РЅР°СЃ)', type:'text'},
+    {id:'d5', text:'РЎРІРѕРёРјРё СЃР»РѕРІР°РјРё: Р·Р°С‡РµРј РєРѕРјРїР°РЅРёРё РЅСѓР¶РµРЅ Р±СѓС…СѓС‡С‘С‚? (РЅРµ РѕС†РµРЅРёРІР°РµС‚СЃСЏ Р±Р°Р»Р»Р°РјРё)', type:'text'}
+  ]
+};
+
+const ALL_BLOCKS = [BLOCK_A, BLOCK_B, BLOCK_C, BLOCK_D];
+const answers = {}; // id -> value(s)
+let flagPractitioner = false;
+let steps = []; // dynamic list of step keys, computed at runtime (E is conditional)
+
+/* ================= RENDER ================= */
+
+function renderBlock(block, index){
+  const root = document.getElementById('quizRoot');
+  const sec = document.createElement('section');
+  sec.className = 'section';
+  sec.dataset.step = 'block-'+block.key;
+
+  let qHtml = '';
+  block.questions.forEach(q=>{
+    qHtml += `<div class="q" data-qid="${q.id}">`;
+    qHtml += `<div class="q-text">${q.text}</div>`;
+    if(q.type === 'text'){
+      qHtml += `<textarea rows="2" onInput="setText('${q.id}', this.value)" placeholder="Р’Р°С€ РѕС‚РІРµС‚..."></textarea>`;
+    } else {
+      qHtml += `<div class="options">`;
+      q.options.forEach((opt, oi)=>{
+        const inputType = q.type==='multi' ? 'checkbox' : 'radio';
+        qHtml += `<label class="opt" id="opt-${q.id}-${oi}">
+          <input type="${inputType}" name="${q.id}" onchange="onOptionChange('${q.id}', ${oi}, '${q.type}', this)">${opt.t}
+        </label>`;
+      });
+      qHtml += `</div>`;
+    }
+    qHtml += `</div>`;
+  });
+
+  sec.innerHTML = `
+    <h2><span class="num">${index+1}</span>${block.title}</h2>
+    <p class="sub">${block.sub}</p>
+    ${qHtml}
+    <div class="error" id="err-${block.key}">РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РѕС‚РІРµС‚СЊС‚Рµ РЅР° РІСЃРµ РІРѕРїСЂРѕСЃС‹ Р±Р»РѕРєР°.</div>
+    <div class="nav">
+      <button class="btn-ghost" onclick="prevStep()">в†ђ РќР°Р·Р°Рґ</button>
+      <button class="btn-primary" onclick="nextFromBlock('${block.key}')">Р”Р°Р»РµРµ в†’</button>
+    </div>
+  `;
+  root.appendChild(sec);
+}
+
+ALL_BLOCKS.forEach((b,i)=> renderBlock(b, i));
+// mark last block's button as "Р—Р°РІРµСЂС€РёС‚СЊ"
+document.querySelectorAll('.section[data-step]').forEach(s=>{});
+
+function onOptionChange(qid, oi, type, inputEl){
+  const label = document.getElementById(`opt-${qid}-${oi}`);
+  if(type==='multi'){
+    label.classList.toggle('selected', inputEl.checked);
+    if(!answers[qid]) answers[qid] = [];
+    if(inputEl.checked){
+      if(!answers[qid].includes(oi)) answers[qid].push(oi);
+    } else {
+      answers[qid] = answers[qid].filter(x=>x!==oi);
+    }
+  } else {
+    document.querySelectorAll(`[id^="opt-${qid}-"]`).forEach(e=>e.classList.remove('selected'));
+    label.classList.add('selected');
+    answers[qid] = oi;
+  }
+}
+function setText(qid, val){ answers[qid] = val; }
+
+/* ================= NAV ================= */
+
+let currentStepIndex = 0; // index into DOM order: intro, block-A, block-B, block-C, block-D, (block-E?), result, admin
+
+function domSteps(){
+  return Array.from(document.querySelectorAll('main .section')).map(s=>s.dataset.step);
+}
+function buildRail(){
+  const rail = document.getElementById('progressRail');
+  rail.innerHTML = '';
+  const total = ['A','B','C','D'].length + 1; // +intro
+  for(let i=0;i<total;i++){
+    const s = document.createElement('span');
+    rail.appendChild(s);
+  }
+}
+buildRail();
+
+function updateRail(activeIdx){
+  const spans = document.querySelectorAll('#progressRail span');
+  spans.forEach((s,i)=> s.classList.toggle('done', i<=activeIdx));
+}
+
+function goTo(stepName_or_index){
+  const all = domSteps();
+  let idx;
+  if(typeof stepName_or_index === 'number'){ idx = stepName_or_index; }
+  else { idx = all.indexOf(stepName_or_index); }
+  all.forEach((name,i)=>{
+    document.querySelector(`main .section[data-step="${name}"]`).classList.toggle('active', i===idx);
+  });
+  currentStepIndex = idx;
+  const railIdx = Math.min(idx, 4);
+  updateRail(railIdx-1>=0?railIdx-1:0);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function prevStep(){
+  const all = domSteps();
+  if(currentStepIndex>0) goTo(currentStepIndex-1);
+}
+
+function blockAnswered(block){
+  return block.questions.every(q=>{
+    if(q.type==='text') return true; // optional, not required
+    if(q.type==='multi') return answers[q.id] && answers[q.id].length>0;
+    return answers[q.id] !== undefined;
+  });
+}
+
+function nextFromBlock(key){
+  const block = ALL_BLOCKS.find(b=>b.key===key);
+  const errEl = document.getElementById('err-'+key);
+  if(!blockAnswered(block)){
+    errEl.style.display='block';
+    return;
+  }
+  errEl.style.display='none';
+
+  if(key==='D'){
+    // check flag
+    const d3 = BLOCK_D.questions.find(q=>q.flagKey);
+    flagPractitioner = d3.options[answers['d3']].flag === true;
+    finishTest();
+    return;
+  }
+  const all = domSteps();
+  const idx = all.indexOf('block-'+key);
+  goTo(idx+1);
+}
+
+/* ================= SCORING ================= */
+
+function scoreBlock(block){
+  let total = 0, max = 0;
+  block.questions.forEach(q=>{
+    if(q.type==='text') return;
+    if(q.type==='multi'){
+      max += Math.max(...q.options.map(o=>o.s)) * 1; // rough max per multi (sum of positive options)
+      max = max; // handled differently below
+    }
+  });
+  // recompute properly
+  total = 0; max = 0;
+  block.questions.forEach(q=>{
+    if(q.type==='text') return;
+    if(q.type==='single'){
+      max += Math.max(...q.options.map(o=>o.s));
+      const chosen = answers[q.id];
+      if(chosen!==undefined) total += q.options[chosen].s;
+    } else if(q.type==='multi'){
+      const positiveMax = q.options.filter(o=>o.s>0).reduce((a,o)=>a+o.s,0);
+      max += positiveMax;
+      const chosenArr = answers[q.id] || [];
+      chosenArr.forEach(oi=> total += q.options[oi].s);
+    }
+  });
+  return {total, max};
+}
+
+function finishTest(){
+  const a = scoreBlock(BLOCK_A);
+  const b = scoreBlock(BLOCK_B);
+  const c = scoreBlock(BLOCK_C);
+  const d = scoreBlock(BLOCK_D);
+
+  const obuchTotal = a.total + b.total + c.total;
+  const obuchMax = a.max + b.max + c.max;
+  const buxTotal = d.total;
+  const buxMax = d.max;
+
+  let group, comment;
+  if(flagPractitioner){
+    group = 'Р’ вЂ” РёРЅРґРёРІРёРґСѓР°Р»СЊРЅРѕРµ СѓСЃРѕРІРµСЂС€РµРЅСЃС‚РІРѕРІР°РЅРёРµ';
+    comment = 'РљР°РЅРґРёРґР°С‚ СѓР¶Рµ РїСЂР°РєС‚РёРєСѓСЋС‰РёР№ Р±СѓС…РіР°Р»С‚РµСЂ. РќРёР¶Рµ вЂ” СЃСЃС‹Р»РєР° РЅР° СѓРіР»СѓР±Р»С‘РЅРЅСѓСЋ РґРёР°РіРЅРѕСЃС‚РёРєСѓ РїРѕ СѓС‡Р°СЃС‚РєР°Рј СѓС‡С‘С‚Р° РґР»СЏ РїРѕРґР±РѕСЂР° РёРЅРґРёРІРёРґСѓР°Р»СЊРЅРѕР№ РїСЂРѕРіСЂР°РјРјС‹.';
+  } else if(obuchTotal >= 25){
+    group = 'Р‘ вЂ” Р±Р°Р·РѕРІС‹Р№ СѓСЂРѕРІРµРЅСЊ';
+    comment = 'Р’С‹СЃРѕРєР°СЏ РѕР±СѓС‡Р°РµРјРѕСЃС‚СЊ РїСЂРё СЃР»Р°Р±С‹С… СЃС‚Р°СЂС‚РѕРІС‹С… Р·РЅР°РЅРёСЏС… Р±СѓС…СѓС‡С‘С‚Р° вЂ” С‚РёРїРёС‡РЅС‹Р№ В«СЃРёР»СЊРЅС‹Р№ РЅРѕРІРёС‡РѕРєВ». РўР°РєРёРµ РєР°РЅРґРёРґР°С‚С‹ РѕР±С‹С‡РЅРѕ Р±С‹СЃС‚СЂРѕ РїСЂРѕРіСЂРµСЃСЃРёСЂСѓСЋС‚ РІ 1РЎ.';
+  } else if(obuchTotal < 15){
+    group = 'Рђ вЂ” РЅР°С‡РёРЅР°СЋС‰РёРµ';
+    comment = 'РџРѕС‚СЂРµР±СѓРµС‚СЃСЏ Р±РѕР»СЊС€Рµ РІСЂРµРјРµРЅРё РЅР° Р±Р°Р·РѕРІС‹Рµ РїРѕРЅСЏС‚РёСЏ Рё РєРѕРјРїСЊСЋС‚РµСЂРЅСѓСЋ РіСЂР°РјРѕС‚РЅРѕСЃС‚СЊ. Р РµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ РіСЂСѓРїРїР° СЃ РјРµРґР»РµРЅРЅС‹Рј С‚РµРјРїРѕРј.';
+  } else {
+    group = 'РџРѕРіСЂР°РЅРёС‡РЅС‹Р№ СЃР»СѓС‡Р°Р№ вЂ” РЅСѓР¶РµРЅ РєРѕСЂРѕС‚РєРёР№ СЃРѕР·РІРѕРЅ';
+    comment = 'Р РµР·СѓР»СЊС‚Р°С‚ РЅРµРѕРґРЅРѕР·РЅР°С‡РЅС‹Р№. Р РµРєРѕРјРµРЅРґСѓРµРј РєРѕСЂРѕС‚РєСѓСЋ Р±РµСЃРµРґСѓ РїРµСЂРµРґ СЂР°СЃРїСЂРµРґРµР»РµРЅРёРµРј РІ РіСЂСѓРїРїСѓ.';
+  }
+
+  document.getElementById('resName').textContent = document.getElementById('candName').value || 'РљР°РЅРґРёРґР°С‚';
+  document.getElementById('resGroup').textContent = group;
+  document.getElementById('resComment').textContent = comment;
+
+  document.getElementById('scoreA').textContent = `${obuchTotal}/${obuchMax}`;
+  document.getElementById('barA').style.width = Math.round(obuchTotal/obuchMax*100)+'%';
+  document.getElementById('scoreD').textContent = `${buxTotal}/${buxMax}`;
+  document.getElementById('barD').style.width = Math.round(buxTotal/buxMax*100)+'%';
+
+  document.getElementById('proTestBlock').style.display = flagPractitioner ? 'block' : 'none';
+
+  goTo('result');
+  saveSubmission({group, obuchTotal, obuchMax, buxTotal, buxMax, flagPractitioner});
+}
+
+/* ================= STORAGE ================= */
+
+const SHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxe4RgBqCZjUEPzIcbb55xTaBQoOLkj49JehsHG8uCMJMuxU8rmwavHIZocvyA7Cz8B/exec';
+
+async function saveSubmission(scoreData){
+  const record = {
+    name: document.getElementById('candName').value || '(Р±РµР· РёРјРµРЅРё)',
+    contact: document.getElementById('candContact').value || '',
+    group: scoreData.group,
+    obuchaemost: `${scoreData.obuchTotal}/${scoreData.obuchMax}`,
+    buxznania: `${scoreData.buxTotal}/${scoreData.buxMax}`,
+    practitioner: scoreData.flagPractitioner,
+    answers: JSON.parse(JSON.stringify(answers)),
+    timestamp: new Date().toISOString()
+  };
+  try{
+    const url = SHEET_ENDPOINT + '?data=' + encodeURIComponent(JSON.stringify(record));
+    await fetch(url, { method: 'GET', mode: 'no-cors' });
+  }catch(e){
+    console.error('Save error', e);
+  }
+}
+</script>
+</body>
+</html>
