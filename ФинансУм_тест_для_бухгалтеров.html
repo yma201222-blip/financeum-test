@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ФинансУм — профдиагностика бухгалтера</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#20BA5A;
+    --green-dark:#0E7C39;
+    --ink:#13271B;
+    --card:#E3F4EA;
+    --border:#CDEBD9;
+    --amber:#E8A63B;
+    --white:#FFFFFF;
+    --danger:#C24444;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: linear-gradient(180deg,#F7FBF8 0%, #EDF7F0 100%);
+    color:var(--ink);
+    font-family:'PT Sans', sans-serif;
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  h1,h2,h3{font-family:'Montserrat',sans-serif;}
+  .wrap{max-width:720px;margin:0 auto;padding:0 20px;}
+
+  .top{
+    background:var(--ink);
+    color:var(--white);
+    padding:36px 0 28px;
+    position:relative;
+    overflow:hidden;
+  }
+  .top::after{
+    content:"Ф";
+    position:absolute;
+    right:-10px; top:-30px;
+    font-family:'Montserrat',sans-serif;
+    font-weight:800;
+    font-size:180px;
+    color:rgba(32,186,90,0.14);
+    line-height:1;
+  }
+  .top .eyebrow{
+    font-family:'PT Mono', monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--green);
+    margin-bottom:10px;
+  }
+  .top h1{font-size:24px;margin:0 0 8px;font-weight:800;}
+  .top p{margin:0;color:#CFE6D8;font-size:14px;max-width:500px;}
+
+  .progress-rail{display:flex;gap:6px;margin:22px 0 0;}
+  .progress-rail span{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,0.18);transition:background .3s;}
+  .progress-rail span.done{background:var(--green);}
+
+  main{padding-top:28px;}
+
+  .section{
+    background:var(--white);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:26px 24px;
+    margin-bottom:18px;
+    display:none;
+  }
+  .section.active{display:block;animation:fadeIn .3s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .section .tag{
+    display:inline-block;
+    font-family:'PT Mono',monospace;
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--green-dark);
+    background:var(--card);
+    border-radius:6px;
+    padding:3px 9px;
+    margin-bottom:10px;
+  }
+  .section h2{font-size:18px;margin:0 0 4px;}
+  .section .sub{color:#5A7566;font-size:13px;margin:0 0 20px;}
+
+  .q{margin-bottom:22px;}
+  .q:last-child{margin-bottom:0;}
+  .q-text{font-weight:700;font-size:15px;margin-bottom:10px;}
+  .options{display:flex;flex-direction:column;gap:8px;}
+  .opt{
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    padding:11px 14px;
+    cursor:pointer;
+    font-size:14px;
+    transition:all .15s;
+    background:#FCFEFC;
+  }
+  .opt:hover{border-color:var(--green);background:var(--card);}
+  .opt.selected{
+    border-color:var(--green-dark);
+    background:var(--card);
+    font-weight:700;
+    box-shadow:inset 0 0 0 1px var(--green-dark);
+  }
+  .opt input{display:none;}
+
+  input[type=text], textarea{
+    width:100%;
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    padding:11px 14px;
+    font-family:'PT Sans',sans-serif;
+    font-size:14px;
+    resize:vertical;
+  }
+  input[type=text]:focus, textarea:focus{outline:2px solid var(--green);border-color:transparent;}
+
+  .nav{display:flex;justify-content:space-between;gap:12px;margin-top:6px;}
+  button{
+    font-family:'Montserrat',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    border-radius:10px;
+    padding:13px 22px;
+    cursor:pointer;
+    border:none;
+  }
+  .btn-primary{background:var(--green-dark);color:var(--white);}
+  .btn-primary:hover{background:var(--green);}
+  .btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--border);}
+  .btn-ghost:hover{border-color:var(--green-dark);}
+
+  .error{color:var(--danger);font-size:13px;margin-top:8px;display:none;}
+
+  .result{
+    background:var(--white);
+    border:2px solid var(--green-dark);
+    border-radius:16px;
+    padding:34px 26px;
+    text-align:center;
+  }
+  .result .badge{
+    display:inline-block;
+    font-family:'PT Mono',monospace;
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--green-dark);
+    border:1px solid var(--green-dark);
+    border-radius:20px;
+    padding:5px 14px;
+    margin-bottom:16px;
+  }
+  .result h2{font-size:22px;margin:0 0 6px;}
+  .result .level{font-size:26px;font-weight:800;color:var(--green-dark);margin:10px 0 4px;}
+  .result .slogan{color:#5A7566;font-size:14px;margin-top:6px;}
+
+  .profile-row{display:flex;justify-content:space-between;font-size:13px;margin:14px 0 3px;text-align:left;}
+  .profile-row .label{color:var(--ink);font-weight:700;}
+  .profile-row .val{color:#5A7566;}
+  .scorebar{height:8px;background:var(--card);border-radius:4px;overflow:hidden;margin-bottom:10px;}
+  .scorebar i{display:block;height:100%;background:var(--green);}
+
+  .goal-box{
+    text-align:left;margin-top:24px;background:var(--card);
+    border-radius:10px;padding:14px 16px;font-size:13px;color:var(--ink);
+  }
+  .goal-box b{display:block;margin-bottom:4px;color:var(--green-dark);}
+
+  @media(max-width:480px){
+    .top h1{font-size:20px;}
+    .section{padding:20px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="wrap">
+    <div class="eyebrow">ФинансУм · Профдиагностика</div>
+    <h1>Тест для практикующих бухгалтеров</h1>
+    <p>15–20 минут. Проверяем знания по всем участкам учёта, отчётности и теории — чтобы предложить программу под ваш реальный уровень и запрос.</p>
+    <div class="progress-rail" id="progressRail"></div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <section class="section active" data-step="intro">
+    <h2>Начало</h2>
+    <p class="sub">Пара слов о вашем опыте</p>
+    <div class="q">
+      <div class="q-text">Ваше имя и фамилия</div>
+      <input type="text" id="candName" placeholder="Например, Заира Алиева">
+    </div>
+    <div class="q">
+      <div class="q-text">Телефон или Telegram для связи</div>
+      <input type="text" id="candContact" placeholder="+7 900 000-00-00 или @username">
+    </div>
+    <div class="q">
+      <div class="q-text">Сколько лет вы работаете бухгалтером?</div>
+      <input type="text" id="candExp" placeholder="Например, 3 года">
+    </div>
+    <div class="nav" style="justify-content:flex-end">
+      <button class="btn-primary" onclick="goTo(1)">Начать →</button>
+    </div>
+  </section>
+
+  <div id="quizRoot"></div>
+
+  <section class="section" data-step="goals">
+    <div class="tag">Финал</div>
+    <h2>Ваш запрос на обучение</h2>
+    <p class="sub">Это самое важное для нас — расскажите своими словами</p>
+    <div class="q">
+      <div class="q-text">С какими участками вы хотели бы поработать в первую очередь? (можно несколько)</div>
+      <div class="options" id="areaInterest"></div>
+    </div>
+    <div class="q">
+      <div class="q-text">Какие именно знания или навыки вы хотите получить? Опишите своими словами — чем конкретнее, тем точнее подберём программу.</div>
+      <textarea rows="4" id="goalText" placeholder="Например: хочу разобраться в учёте ОС и начать уверенно закрывать НДС самостоятельно, без помощи коллег"></textarea>
+    </div>
+    <div class="nav">
+      <button class="btn-ghost" onclick="prevStep()">← Назад</button>
+      <button class="btn-primary" onclick="finishTest()">Завершить →</button>
+    </div>
+  </section>
+
+  <section class="section" data-step="result">
+    <div class="result">
+      <div class="badge">Результат диагностики</div>
+      <h2 id="resName">Кандидат</h2>
+      <div class="level" id="resLevel">—</div>
+      <div class="slogan">Бухгалтерия — это понятно</div>
+
+      <div id="profileList"></div>
+
+      <div class="goal-box" id="goalBox" style="display:none;">
+        <b>Запрос на обучение</b>
+        <span id="goalDisplay"></span>
+      </div>
+      <p style="text-align:center;font-size:12px;color:#8CA697;margin-top:26px;">Результат автоматически сохранён и отправлен организатору.</p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ================= DATA ================= */
+/* area codes: primary, sklad, kassa, zp, nds, nalog, otchet, theory */
+
+const AREAS = {
+  primary:{ label:'Первичка и ОС', title:'Первичные документы и основные средства', sub:'Документооборот, учёт основных средств и НМА' },
+  sklad:{ label:'Склад и МПЗ', title:'Материалы и товары', sub:'Учёт запасов, поступление и списание' },
+  kassa:{ label:'Касса и банк', title:'Касса и банк', sub:'Расчётные операции, кассовая дисциплина' },
+  zp:{ label:'Зарплата и кадры', title:'Зарплата и кадровый учёт', sub:'Начисления, взносы, кадровые документы' },
+  nds:{ label:'НДС', title:'НДС', sub:'' },
+  nalog:{ label:'Налог на прибыль / УСН', title:'Налог на прибыль и УСН', sub:'' },
+  otchet:{ label:'Отчётность', title:'Отчётность', sub:'Бухгалтерская, налоговая, в фонды' },
+  theory:{ label:'Теория учёта', title:'Теория бухгалтерского учёта', sub:'Метод двойной записи, план счетов, баланс' }
+};
+
+const BLOCKS = [
+  { area:'primary', questions:[
+    {id:'p1', text:'Какой документ подтверждает факт хозяйственной операции и является основанием для отражения в учёте?', type:'single',
+      options:[{t:'Первичный учётный документ', s:2},{t:'Учётная политика', s:0},{t:'План счетов', s:0}]},
+    {id:'p2', text:'С какой суммы (по общему правилу) имущество признаётся основным средством в бухучёте, а не материалами?', type:'single',
+      options:[{t:'Лимит определяется организацией самостоятельно в учётной политике', s:2},{t:'Всегда строго 100 000 ₽', s:0},{t:'Всегда строго 40 000 ₽', s:0}]},
+    {id:'p3', text:'Что происходит с первоначальной стоимостью ОС при модернизации?', type:'single',
+      options:[{t:'Увеличивается на сумму модернизации', s:2},{t:'Не меняется', s:0},{t:'Списывается полностью и создаётся новый объект', s:0}]}
+  ]},
+  { area:'sklad', questions:[
+    {id:'s1', text:'Какими методами можно списывать материалы в производство согласно учётной политике?', type:'single',
+      options:[{t:'По себестоimости каждой единицы или по средней себестоимости', s:2},{t:'Только по себестоимости первой партии (ФИФО обязательно)', s:0},{t:'Списание материалов не регламентируется', s:0}]},
+    {id:'s2', text:'На каком счёте учитываются товары, приобретённые для перепродажи?', type:'single',
+      options:[{t:'41 «Товары»', s:2},{t:'10 «Материалы»', s:0},{t:'43 «Готовая продукция»', s:0}]}
+  ]},
+  { area:'kassa', questions:[
+    {id:'k1', text:'Обязаны ли ИП и малые предприятия устанавливать лимит остатка кассы?', type:'single',
+      options:[{t:'Могут не устанавливать лимит, но должны это закрепить документально', s:2},{t:'Обязаны все без исключений', s:0},{t:'Лимит не регулируется законом', s:0}]},
+    {id:'k2', text:'Каким документом оформляется выдача денег из кассы под отчёт?', type:'single',
+      options:[{t:'Расходный кассовый ордер (РКО)', s:2},{t:'Приходный кассовый ордер (ПКО)', s:0},{t:'Товарная накладная', s:0}]},
+    {id:'k3', text:'Что отражается на счёте 51?', type:'single',
+      options:[{t:'Движение денег на расчётном счёте', s:2},{t:'Расчёты с поставщиками', s:0},{t:'Наличные в кассе', s:0}]}
+  ]},
+  { area:'zp', questions:[
+    {id:'z1', text:'Какой единый тариф страховых взносов действует для большинства работодателей (в пределах базы, общий случай)?', type:'single',
+      options:[{t:'30%', s:2},{t:'13%', s:0},{t:'6%', s:0}]},
+    {id:'z2', text:'В какой срок нужно перечислить НДФЛ с заработной платы после её выплаты (по общему правилу для большинства выплат)?', type:'single',
+      options:[{t:'Не позднее следующего рабочего дня', s:2},{t:'В течение месяца', s:0},{t:'В день начисления зарплаты', s:0}]},
+    {id:'z3', text:'Каким документом оформляется приём сотрудника на работу?', type:'single',
+      options:[{t:'Трудовой договор и приказ о приёме', s:2},{t:'Только устная договорённость', s:0},{t:'Служебная записка', s:0}]}
+  ]},
+  { area:'nds', questions:[
+    {id:'n1', text:'Какая стандартная ставка НДС применяется в общем случае?', type:'single',
+      options:[{t:'20%', s:2},{t:'18%', s:0},{t:'13%', s:0}]},
+    {id:'n2', text:'Что даёт право на вычет входного НДС?', type:'single',
+      options:[{t:'Правильно оформленный счёт-фактура и принятие товара/услуги к учёту', s:2},{t:'Любой договор с поставщиком', s:0},{t:'Оплата товара наличными', s:0}]},
+    {id:'n3', text:'В какие сроки подаётся декларация по НДС?', type:'single',
+      options:[{t:'Ежеквартально, до 25 числа месяца, следующего за кварталом', s:2},{t:'Раз в год', s:0},{t:'Ежемесячно всегда', s:0}]}
+  ]},
+  { area:'nalog', questions:[
+    {id:'np1', text:'Какая стандартная ставка налога на прибыль для большинства организаций?', type:'single',
+      options:[{t:'25%', s:2},{t:'13%', s:0},{t:'6%', s:0}]},
+    {id:'np2', text:'Чем отличается УСН «Доходы» от УСН «Доходы минус расходы»?', type:'single',
+      options:[{t:'Базой налогообложения и ставкой — во втором случае учитываются расходы', s:2},{t:'Ничем, ставка одинаковая', s:0},{t:'Только сроками подачи отчётности', s:0}]},
+    {id:'np3', text:'Может ли ИП совмещать УСН с патентной системой налогообложения?', type:'single',
+      options:[{t:'Да, при соблюдении условий по видам деятельности', s:2},{t:'Нет, это невозможно ни при каких условиях', s:0},{t:'Только если нет наёмных работников', s:0}]}
+  ]},
+  { area:'otchet', questions:[
+    {id:'o1', text:'В какой срок сдаётся годовая бухгалтерская отчётность в ИФНС?', type:'single',
+      options:[{t:'Не позднее 31 марта следующего года', s:2},{t:'Не позднее 1 февраля', s:0},{t:'В течение 10 дней после утверждения', s:0}]},
+    {id:'o2', text:'Что входит в состав годовой бухгалтерской отчётности малого предприятия (упрощённый состав)?', type:'single',
+      options:[{t:'Бухгалтерский баланс и отчёт о финансовых результатах', s:2},{t:'Только баланс', s:0},{t:'Только налоговая декларация', s:0}]},
+    {id:'o3', text:'Какую отчётность нужно сдавать по сотрудникам в Социальный фонд?', type:'single',
+      options:[{t:'ЕФС-1 (в соответствующих разделах)', s:2},{t:'6-НДФЛ', s:0},{t:'РСВ', s:0}]}
+  ]},
+  { area:'theory', questions:[
+    {id:'t1', text:'Что отражает бухгалтерский баланс?', type:'single',
+      options:[{t:'Активы и источники их формирования (пассивы) на определённую дату', s:2},{t:'Только доходы и расходы за период', s:0},{t:'Только движение денежных средств', s:0}]},
+    {id:'t2', text:'В чём суть метода двойной записи?', type:'single',
+      options:[{t:'Каждая операция отражается одновременно по дебету одного счёта и кредиту другого на одну сумму', s:2},{t:'Каждая операция записывается дважды в одном и том же счёте', s:0},{t:'Операции фиксируются один раз в конце месяца', s:0}]},
+    {id:'t3', text:'Что регулирует учётная политика организации?', type:'single',
+      options:[{t:'Способы ведения бухучёта, выбранные организацией из разрешённых законом вариантов', s:2},{t:'Штатное расписание', s:0},{t:'Только кадровые вопросы', s:0}]},
+    {id:'t4', text:'Что происходит со счётом при увеличении актива?', type:'single',
+      options:[{t:'Дебетуется (увеличение по дебету)', s:2},{t:'Кредитуется', s:0},{t:'Счёт закрывается', s:0}]}
+  ]}
+];
+
+const answers = {};
+
+/* ================= RENDER ================= */
+
+function renderBlock(block, index){
+  const root = document.getElementById('quizRoot');
+  const areaInfo = AREAS[block.area];
+  const sec = document.createElement('section');
+  sec.className = 'section';
+  sec.dataset.step = 'block-'+block.area;
+
+  let qHtml = '';
+  block.questions.forEach(q=>{
+    qHtml += `<div class="q" data-qid="${q.id}">
+      <div class="q-text">${q.text}</div>
+      <div class="options">`;
+    q.options.forEach((opt, oi)=>{
+      qHtml += `<label class="opt" id="opt-${q.id}-${oi}">
+        <input type="radio" name="${q.id}" onchange="onOptionChange('${q.id}', ${oi}, this)">${opt.t}
+      </label>`;
+    });
+    qHtml += `</div></div>`;
+  });
+
+  sec.innerHTML = `
+    <div class="tag">${index+1} / ${BLOCKS.length}</div>
+    <h2>${areaInfo.title}</h2>
+    <p class="sub">${areaInfo.sub}</p>
+    ${qHtml}
+    <div class="error" id="err-${block.area}">Пожалуйста, ответьте на все вопросы блока.</div>
+    <div class="nav">
+      <button class="btn-ghost" onclick="prevStep()">← Назад</button>
+      <button class="btn-primary" onclick="nextFromBlock('${block.area}')">Далее →</button>
+    </div>
+  `;
+  root.appendChild(sec);
+}
+BLOCKS.forEach((b,i)=> renderBlock(b, i));
+
+function onOptionChange(qid, oi, inputEl){
+  const label = document.getElementById(`opt-${qid}-${oi}`);
+  document.querySelectorAll(`[id^="opt-${qid}-"]`).forEach(e=>e.classList.remove('selected'));
+  label.classList.add('selected');
+  answers[qid] = oi;
+}
+
+/* interest checkboxes on goals page */
+const areaInterestRoot = document.getElementById('areaInterest');
+Object.keys(AREAS).forEach(code=>{
+  const div = document.createElement('label');
+  div.className = 'opt';
+  div.id = 'interest-'+code;
+  div.innerHTML = `<input type="checkbox" onchange="toggleInterest('${code}', this)">${AREAS[code].label}`;
+  areaInterestRoot.appendChild(div);
+});
+let interestSelected = [];
+function toggleInterest(code, el){
+  document.getElementById('interest-'+code).classList.toggle('selected', el.checked);
+  if(el.checked){ if(!interestSelected.includes(code)) interestSelected.push(code); }
+  else{ interestSelected = interestSelected.filter(c=>c!==code); }
+}
+
+/* ================= NAV ================= */
+
+let currentStepIndex = 0;
+function domSteps(){ return Array.from(document.querySelectorAll('main .section')).map(s=>s.dataset.step); }
+
+function buildRail(){
+  const rail = document.getElementById('progressRail');
+  rail.innerHTML = '';
+  const total = BLOCKS.length + 2; // intro + blocks + goals
+  for(let i=0;i<total;i++){ rail.appendChild(document.createElement('span')); }
+}
+buildRail();
+function updateRail(activeIdx){
+  const spans = document.querySelectorAll('#progressRail span');
+  spans.forEach((s,i)=> s.classList.toggle('done', i<=activeIdx));
+}
+
+function goTo(stepName_or_index){
+  const all = domSteps();
+  let idx = typeof stepName_or_index === 'number' ? stepName_or_index : all.indexOf(stepName_or_index);
+  all.forEach((name,i)=>{
+    document.querySelector(`main .section[data-step="${name}"]`).classList.toggle('active', i===idx);
+  });
+  currentStepIndex = idx;
+  updateRail(idx);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function prevStep(){ if(currentStepIndex>0) goTo(currentStepIndex-1); }
+
+function blockAnswered(block){
+  return block.questions.every(q=> answers[q.id] !== undefined);
+}
+function nextFromBlock(area){
+  const block = BLOCKS.find(b=>b.area===area);
+  const errEl = document.getElementById('err-'+area);
+  if(!blockAnswered(block)){ errEl.style.display='block'; return; }
+  errEl.style.display='none';
+  const all = domSteps();
+  goTo(all.indexOf('block-'+area)+1);
+}
+
+/* ================= SCORING ================= */
+
+function scoreArea(block){
+  let total=0, max=0;
+  block.questions.forEach(q=>{
+    max += Math.max(...q.options.map(o=>o.s));
+    const chosen = answers[q.id];
+    if(chosen!==undefined) total += q.options[chosen].s;
+  });
+  return {total, max};
+}
+
+function finishTest(){
+  const profile = BLOCKS.map(b=>({area:b.area, ...scoreArea(b)}));
+  const grandTotal = profile.reduce((a,p)=>a+p.total,0);
+  const grandMax = profile.reduce((a,p)=>a+p.max,0);
+  const pct = Math.round(grandTotal/grandMax*100);
+
+  let level;
+  if(pct>=80) level = 'Уверенный уровень';
+  else if(pct>=55) level = 'Средний уровень, есть пробелы';
+  else level = 'Много пробелов — нужна системная программа';
+
+  document.getElementById('resName').textContent = document.getElementById('candName').value || 'Кандидат';
+  document.getElementById('resLevel').textContent = level;
+
+  const listEl = document.getElementById('profileList');
+  listEl.innerHTML = '';
+  profile.forEach(p=>{
+    const areaPct = Math.round(p.total/p.max*100);
+    const row = document.createElement('div');
+    row.innerHTML = `
+      <div class="profile-row"><span class="label">${AREAS[p.area].label}</span><span class="val">${p.total}/${p.max}</span></div>
+      <div class="scorebar"><i style="width:${areaPct}%"></i></div>
+    `;
+    listEl.appendChild(row);
+  });
+
+  const goalText = document.getElementById('goalText').value.trim();
+  if(goalText || interestSelected.length){
+    document.getElementById('goalBox').style.display='block';
+    const interestLabels = interestSelected.map(c=>AREAS[c].label).join(', ');
+    document.getElementById('goalDisplay').textContent =
+      (interestLabels ? `Интересующие участки: ${interestLabels}. ` : '') + goalText;
+  }
+
+  goTo('result');
+  saveSubmission({profile, grandTotal, grandMax, pct, level, goalText, interestSelected});
+}
+
+/* ================= STORAGE ================= */
+
+const SHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxe4RgBqCZjUEPzIcbb55xTaBQoOLkj49JehsHG8uCMJMuxU8rmwavHIZocvyA7Cz8B/exec';
+
+async function saveSubmission(data){
+  const record = {
+    testType: 'practitioner',
+    name: document.getElementById('candName').value || '(без имени)',
+    contact: document.getElementById('candContact').value || '',
+    experience: document.getElementById('candExp').value || '',
+    level: data.level,
+    totalScore: `${data.grandTotal}/${data.grandMax} (${data.pct}%)`,
+    profile: data.profile.map(p=>`${AREAS[p.area].label}: ${p.total}/${p.max}`).join(' | '),
+    interestAreas: data.interestSelected.map(c=>AREAS[c].label).join(', '),
+    goalText: data.goalText,
+    answers: JSON.parse(JSON.stringify(answers)),
+    timestamp: new Date().toISOString()
+  };
+  try{
+    const url = SHEET_ENDPOINT + '?data=' + encodeURIComponent(JSON.stringify(record));
+    await fetch(url, { method:'GET', mode:'no-cors' });
+  }catch(e){ console.error('Save error', e); }
+}
+</script>
+</body>
+</html>
